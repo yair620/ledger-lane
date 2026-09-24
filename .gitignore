@@ -4,3 +4,7 @@ node_modules/
 .env.*
 *.log
 .DS_Store
+public/.deploy-payload.json
+.wrangler/
+.deploy-artifacts/
+.vercel/
