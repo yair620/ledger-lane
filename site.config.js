@@ -1,7 +1,7 @@
 // Single source of truth for the public origin and monetised destination.
 // Cloudflare Pages serves each HTML file without its extension and 308-redirects
 // the .html form, so canonicals, internal links and the sitemap must be extensionless.
-export const SITE_URL = 'https://paymentclarity.pages.dev';
+export const SITE_URL = 'https://paymentclarity.cryptoguides.net';
 export const CUSTOM_DOMAIN = 'paymentclarity.cryptoguides.net';
 export const AFFILIATE_URL = 'https://gamdom.com/r/csgo2026';
 export const SITE_NAME = 'Payment Clarity';
