@@ -21,4 +21,4 @@ createServer(async (req, res) => {
   }
   res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
   res.end('Not found');
-}).listen(port, '127.0.0.1', () => console.log(`Ledger Lane listening on http://127.0.0.1:${port}`));
+}).listen(port, '127.0.0.1', () => console.log(`Payment Clarity listening on http://127.0.0.1:${port}`));
