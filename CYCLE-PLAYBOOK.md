@@ -31,8 +31,9 @@ nothing here delegates the work to another agent.
    status to leave `initializing`.
 8. Set `SITE_URL` in `site.config.js` to `https://<sub>.cryptoguides.net`, regenerate,
    redeploy, and re-run step 3 against the custom domain.
-9. Supersede the previous cycle: deploy a `_redirects` payload to the old Pages project so
-   `/*` returns 301 to the live site, and keep its `robots.txt` at `Disallow: /`.
+9. Supersede the previous cycle: copy `scripts/legacy-redirect` to a temporary directory,
+   point `_redirects` and the fallback page at the new custom domain, deploy that payload to
+   the old Pages project so `/*` returns 301, and keep its `robots.txt` at `Disallow: /`.
 10. Report: live URL, deployment ids, page and affiliate counts, verification output, and
     any step that did not complete.
 
@@ -47,15 +48,28 @@ nothing here delegates the work to another agent.
 - The affiliate destination responds and keeps its parameters
   (`https://gamdom.com/r/csgo2026` -> 302 -> `https://gamdom.com/?aff=csgo2026`).
 
-## Open dependency
+## DNS step (how the subdomain is made to resolve)
 
-Step 7 needs one DNS record per subdomain in `cryptoguides.net`, which is served by Namecheap
-BasicDNS (`dns1/dns2.registrar-servers.com`). The connected Cloudflare account holds no zone
-for that domain, so the record must be created at Namecheap:
+`cryptoguides.net` is served by Namecheap BasicDNS (`dns1/dns2.registrar-servers.com`), and the
+connected Cloudflare account holds no zone for it. Each cycle therefore creates **one new record
+only** in the Namecheap dashboard (Advanced DNS -> Add New Record):
 
-- either a one-time API key with `cryptoguides.net` whitelisted, which lets each cycle create
-  its own CNAME record programmatically, or
-- a signed-in Namecheap session in the browser, reused per cycle.
+| Type | Host | Target | TTL |
+| --- | --- | --- | --- |
+| CNAME Record | the new subdomain | `<pages-project>.pages.dev` | Automatic |
+
+The dashboard is an Angular app with a modal editor, so the reliable path is: sign in to
+Namecheap in the browser, open `ap.www.namecheap.com/Domains/DomainControlPanel/cryptoguides.net/advancedns`,
+click `Add New Record`, set Record Type to `CNAME Record`, fill Host and Target, then click
+`Save Changes` in the modal, and confirm the new row appears in HOST RECORDS.
+
+Never edit the existing `@` A record, the `www` CNAME, the SPF TXT record, or the email
+forwarding MX records: the apex site and its mail depend on them.
+
+After the record saves, DNS propagates in about a minute and Cloudflare issues the certificate
+(Google CA, HTTP validation) within roughly two minutes. The Pages domain record moves
+`pending` -> `active`; verify with `GET /accounts/{account_id}/pages/projects/{project}/domains`
+and by polling `curl https://<sub>.cryptoguides.net/` until it answers 200.
 
 ## Known limits
 
